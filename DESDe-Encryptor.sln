@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DESDe-Encryptor", "DESDe-Encryptor\DESDe-Encryptor.csproj", "{50D5A9ED-1A0E-413B-9F58-BF5C1D5A8B3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModel", "ViewModel\ViewModel.csproj", "{D482E9BB-D9CD-47FD-A768-023E5706C94F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{044B1437-FC43-4569-967F-730ADAB54181}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50D5A9ED-1A0E-413B-9F58-BF5C1D5A8B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D5A9ED-1A0E-413B-9F58-BF5C1D5A8B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50D5A9ED-1A0E-413B-9F58-BF5C1D5A8B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50D5A9ED-1A0E-413B-9F58-BF5C1D5A8B3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D482E9BB-D9CD-47FD-A768-023E5706C94F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D482E9BB-D9CD-47FD-A768-023E5706C94F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D482E9BB-D9CD-47FD-A768-023E5706C94F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D482E9BB-D9CD-47FD-A768-023E5706C94F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{044B1437-FC43-4569-967F-730ADAB54181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{044B1437-FC43-4569-967F-730ADAB54181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{044B1437-FC43-4569-967F-730ADAB54181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{044B1437-FC43-4569-967F-730ADAB54181}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E7130C36-C32B-412D-B8E3-1710EC263EC3}
+	EndGlobalSection
+EndGlobal
