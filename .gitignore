@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/DESDe-Encryptor/v15
+/DESDe-Encryptor/obj/Debug/DESDe-Encryptor_MarkupCompile.lref
+/DESDe-Encryptor/obj/Debug/DESDe-Encryptor_MarkupCompile.cache
+/DESDe-Encryptor/obj/Debug/DESDe-Encryptor.csprojAssemblyReference.cache
+/DESDe-Encryptor/obj/Debug/DESDe-Encryptor.csproj.CoreCompileInputs.cache
+/Model/obj/Debug
+/ViewModel/obj/Debug
+/DESDe-Encryptor/obj/Debug
