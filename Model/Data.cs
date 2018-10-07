@@ -8,24 +8,34 @@ namespace Model
 {
     public class Data
     {
-        private readonly byte _blockSize = 8;
+        #region fields
+        private readonly byte _blockSize;
         private readonly byte[] _bytes;
         private readonly Encoding _encoding;
+        #endregion
 
-        public Data(string data) : this(data, Encoding.UTF8) { }
+        #region properties
+        public int NumberOfBlocks { get { return _bytes.Count() / _blockSize; } }
+        #endregion
 
-        public Data(string data, Encoding encoding)
+        #region constructors
+        public Data(string data) : this(data, Encoding.Unicode, 8) { }
+
+        public Data(string data, Encoding encoding, byte blockSize)
         {
+            _blockSize = blockSize;
             _encoding = encoding;
             _bytes = encoding.GetBytes(data);
-            int leftover = _bytes.Count() % _blockSize; // if plain text is not divisible by 64 bits (8 bytes)
+            int leftover = _bytes.Count() % _blockSize; // if plain text is not divisible by size of a block
             if(leftover != 0)
             {
-                byte[] nulls = Enumerable.Repeat((byte)0, leftover).ToArray(); // generate missing bytes
-                _bytes.Concat(nulls);                                          // concat arrays
+                byte[] nulls = Enumerable.Repeat((byte)0, _blockSize - leftover).ToArray(); // generate missing bytes
+                _bytes = _bytes.Concat(nulls).ToArray();                                                       // concat arrays
             }
         }
+        #endregion
 
+        #region methods
         /// <summary>
         /// Takes n-th block of plain unecrypted text
         /// </summary>
@@ -33,11 +43,12 @@ namespace Model
         /// <returns>Byte array of that block</returns>
         public byte[] GetNBlock(int blockIndex)
         {
-            if ((blockIndex - 1) * _blockSize < _bytes.Count())
+            if ((blockIndex) * _blockSize < _bytes.Count())
             {
-                return _bytes.Skip((blockIndex - 1) * _blockSize).Take(_blockSize).ToArray();
+                return _bytes.Skip((blockIndex) * _blockSize).Take(_blockSize).ToArray();
             }
             throw new IndexOutOfRangeException("blockIndex is too big");
         }
+        #endregion
     }
 }
