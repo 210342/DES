@@ -8,7 +8,6 @@ namespace Model.Enum
 {
     enum BitMasks : byte
     {
-        Zero = 0x00,
         First = 0x01,
         Second = 0x02,
         Third = 0x04,
@@ -17,6 +16,22 @@ namespace Model.Enum
         Sixth = 0x20,
         Seventh = 0x40,
         Eighth = 0x80,
-        Full = 0xFF
+        Zero = 0x00,
+        Full = 0xFF,
+        Left = 0xF0,
+        Right = 0x0F,
+        MostSignificantOne = 0x80,
+        MostSignificantTwo = 0xC0,
+        MostSignificantThree = 0xE0,
+        MostSignificantFive = 0xF8,
+        MostSignificantSix = 0xFC,
+        MostSignificantSeven = 0xFE,
+        LeastSignificantOne = 0x01,
+        LeastSignificantTwo = 0x03,
+        LeastSignificantThree = 0x07,
+        LeastSignificantFive = 0x1F,
+        LeastSignificantSix = 0x3F,
+        LeastSignificantSeven = 0x7F,
+
     }
 }

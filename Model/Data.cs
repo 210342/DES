@@ -30,7 +30,7 @@ namespace Model
             if(leftover != 0)
             {
                 byte[] nulls = Enumerable.Repeat((byte)0, _blockSize - leftover).ToArray(); // generate missing bytes
-                _bytes = _bytes.Concat(nulls).ToArray();                                                       // concat arrays
+                _bytes = _bytes.Concat(nulls).ToArray();                                    // concat arrays
             }
         }
         #endregion

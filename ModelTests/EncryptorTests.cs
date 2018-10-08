@@ -47,5 +47,21 @@ namespace Model.Tests
             Assert.AreEqual(0xFF, example[6]);
             Assert.AreEqual(0xFF, example[7]);
         }
+
+        [TestMethod()]
+        public void LeftBitShiftTest()
+        {
+            byte example = 0x08;
+            Assert.AreEqual(0x10, Encryptor.LeftBitShift(example, 1));
+            Assert.AreEqual(0x04, Encryptor.LeftBitShift(example, -1));
+        }
+
+        [TestMethod()]
+        public void GetBitTest()
+        {
+            byte[] example = Enumerable.Repeat((byte)0x01, 2).ToArray();
+            Assert.AreEqual(0x00, Encryptor.GetBit(example, 0));
+            Assert.AreEqual(0x01, Encryptor.GetBit(example, 15));
+        }
     }
 }

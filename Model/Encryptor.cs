@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Model.Enum;
 
+// Source: https://www.nku.edu/~christensen/DESschneier.pdf
+
 namespace Model
 {
     public class Encryptor
     {
-        private readonly byte[] _encrypted;
+        //private readonly byte[] _encrypted;
         private readonly byte _blockSize = 8; // bytes
 
         public void Encrypt(string message)
@@ -54,10 +56,9 @@ namespace Model
                 {
                     for (int j = 0; j < 8; ++j) // 8 bits in a byte
                     {
-                        int bitShift = 7 - masksOrder[i] - j;
+                        sbyte bitShift = (sbyte)(7 - masksOrder[i] - j);
                         int tmp = (byte)(original[7 - j] & (byte)masks[masksOrder[i]]);
-                        tmp = LeftBitShift(tmp, bitShift);
-                        result[i] |= (byte)((byte)BitMasks.Full & tmp);
+                        result[i] |= LeftBitShift(tmp, bitShift);
                     }
                 }
                 return result;
@@ -81,10 +82,9 @@ namespace Model
                 {
                     for (int j = 7; j >= 0; --j) // 8 bits in a byte
                     {
-                        int bitShift = -7 + i + j;
+                        sbyte bitShift = (sbyte)(-7 + i + j);
                         int tmp = (byte)(original[j] & (byte)masks[7 - i]);
-                        tmp = LeftBitShift(tmp, bitShift);
-                        result[bytesOrder[i]] |= (byte)((byte)BitMasks.Full & tmp);
+                        result[bytesOrder[i]] |= LeftBitShift(tmp, bitShift);
                     }
                 }
                 return result;
@@ -99,12 +99,29 @@ namespace Model
         /// <param name="operand">Operand</param>
         /// <param name="value">Length of the shift</param>
         /// <returns></returns>
-        private static int LeftBitShift(int operand, int value)
+        public static byte LeftBitShift(int operand, sbyte value)
         {
             if (value >= 0)
-                return (operand << value);
+                return (byte)(operand << value);
             else
-                return (operand >> Math.Abs(value));
+                return (byte)(operand >> Math.Abs(value));
+        }
+
+        /// <summary>
+        /// Get bit from byte array given by index
+        /// (where zero is the most significant bit
+        /// in a byte)
+        /// </summary>
+        /// <param name="source">Byte array</param>
+        /// <param name="index">Index of interested bit</param>
+        /// <returns></returns>
+        public static byte GetBit(byte[] source, byte index)
+        {
+            byte byteIndex = (byte)(index / 8);
+            byte bitIndex = (byte)(index % 8);
+            byte bitMask = (byte)(0x80 >> bitIndex);
+            byte bit = (byte)((bitMask & source[byteIndex]) >> (7 - bitIndex));
+            return bit;
         }
     }
 }
