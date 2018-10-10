@@ -14,6 +14,10 @@ namespace Model
         private readonly byte[] _key = new byte[8]; // 8 bytes = 64 bits
         private readonly byte[] _56BitKey = new byte[7];
 
+#if DEBUG
+        public byte[] MainKey { get { return _key; } }
+#endif
+
         public ICollection<byte[]> Subkeys = new List<byte[]>();
 
         public Key()
@@ -28,6 +32,15 @@ namespace Model
             if(key.Count() == 8)
             {
                 _key = key;
+            }
+        }
+
+        public Key(UInt64 key)
+        {
+            _key = new byte[8];
+            for(byte i = 0; i < 8; ++i)
+            {
+                _key[i] = (byte)(key >> (7 - i) * 8);
             }
         }
 
@@ -67,16 +80,13 @@ namespace Model
             byte[] shifts = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
             UInt32 leftHalf = GetIntFromByteArray(_56BitKey.Take(4).ToArray());    // both halves will have 28 bits, 
             UInt32 rightHalf = GetIntFromByteArray(_56BitKey.Skip(3).Take(4).ToArray());   // 4 bits reserved
-            leftHalf = (byte)((leftHalf & 0xFFFFFFF0) >> 4);  // ignore last 4 bits, then move everything
-                                                              // to make most significant bits reserved
+            leftHalf = (byte)(leftHalf >> 4);                 // move all bits to make most significant bits reserved
             rightHalf = (byte)(rightHalf & 0x0FFFFFFF);       // ignore first 4 bits
             for (byte i = 0; i < 16; ++i)
             {
                 leftHalf = SubkeyShift(leftHalf, shifts[i]);
                 rightHalf = SubkeyShift(rightHalf, shifts[i]);
-
-
-
+                Subkeys.Add(MergeHalves(leftHalf, rightHalf));
             }
         }
 
@@ -87,12 +97,24 @@ namespace Model
 #endif
         {
             byte[] result = new byte[7];
-            //not implemented yet
+            leftHalf <<= 4; // make least significant bits reserved
+            for(byte i = 0; i < 3; ++i) // rewrite first 3 bytes
+            {
+                result[i] = (byte)(leftHalf >> (3 - i) * 8);
+            }
+            // rewrite 4th byte
+            byte leftMiddleByte = (byte)leftHalf;
+            byte rightMiddleByte = (byte)(rightHalf >> 24);
+            result[3] = (byte)(leftMiddleByte | rightMiddleByte);
+            for (byte i = 1; i < 4; ++i) // rewrite last 3 bytes
+            {
+                result[3 + i] = (byte)(rightHalf >> (3 - i) * 8);
+            }
             return result;
         }
 
 #if DEBUG
-            public static UInt32 SubkeyShift(UInt32 halfKey, byte step)
+        public static UInt32 SubkeyShift(UInt32 halfKey, byte step)
 #else
         private UInt32 SubkeyShift(UInt32 halfKey, byte step)
 #endif
@@ -110,9 +132,9 @@ namespace Model
         /// </summary>
         /// <returns></returns>
 #if DEBUG
-        public byte[] SubkeyPermutation() 
+        public static byte[] SubkeyPermutation(byte[] key)
 #else
-        private byte[] SubkeyPermutation() 
+        private byte[] SubkeyPermutation(byte[] key) 
 #endif
         {
             byte[] result = new byte[6]; // Generate 48 bit subkeys
@@ -128,7 +150,7 @@ namespace Model
                 {
                     byte bitIndex = (byte)(i * 8 + j);
                     sbyte bitShift = (sbyte)(7 - j);
-                    byte tmp = Encryptor.GetBit(_key, bitOrder[bitIndex]);
+                    byte tmp = Encryptor.GetBit(key, bitOrder[bitIndex]);
                     result[i] |= Encryptor.LeftBitShift(tmp, bitShift);
                 }
             }
