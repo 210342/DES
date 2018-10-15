@@ -33,6 +33,7 @@ namespace Model
             {
                 _key = key;
             }
+            _56BitKey = KeyPermutation();
         }
 
         public Key(UInt64 key)
@@ -42,6 +43,7 @@ namespace Model
             {
                 _key[i] = (byte)(key >> (7 - i) * 8);
             }
+            _56BitKey = KeyPermutation();
         }
 
 #if DEBUG
@@ -80,13 +82,13 @@ namespace Model
             byte[] shifts = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
             UInt32 leftHalf = GetIntFromByteArray(_56BitKey.Take(4).ToArray());    // both halves will have 28 bits, 
             UInt32 rightHalf = GetIntFromByteArray(_56BitKey.Skip(3).Take(4).ToArray());   // 4 bits reserved
-            leftHalf = (byte)(leftHalf >> 4);                 // move all bits to make most significant bits reserved
-            rightHalf = (byte)(rightHalf & 0x0FFFFFFF);       // ignore first 4 bits
+            leftHalf = (leftHalf >> 4);                 // move all bits to make most significant bits reserved
+            rightHalf = (rightHalf & 0x0FFFFFFF);       // ignore first 4 bits
             for (byte i = 0; i < 16; ++i)
             {
                 leftHalf = SubkeyShift(leftHalf, shifts[i]);
                 rightHalf = SubkeyShift(rightHalf, shifts[i]);
-                Subkeys.Add(MergeHalves(leftHalf, rightHalf));
+                Subkeys.Add(SubkeyPermutation(MergeHalves(leftHalf, rightHalf)));
             }
         }
 
