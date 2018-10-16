@@ -159,13 +159,6 @@ namespace Model.Tests
         }
 
         [TestMethod()]
-        public void GetIntFromByteArrayTest()
-        {
-            byte[] example = Enumerable.Repeat((byte)0xAA, 4).ToArray();
-            Assert.AreEqual(0xAAAAAAAA, Key.GetIntFromByteArray(example));
-        }
-
-        [TestMethod()]
         public void MergeHalvesTest()
         {
             UInt32 left = 0x0000055F, right = 0x0FAA0000;

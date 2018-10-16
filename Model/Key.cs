@@ -29,7 +29,7 @@ namespace Model
 
         public Key(byte[] key)
         {
-            if(key.Count() == 8)
+            if (key.Count() == 8)
             {
                 _key = key;
             }
@@ -39,7 +39,7 @@ namespace Model
         public Key(UInt64 key)
         {
             _key = new byte[8];
-            for(byte i = 0; i < 8; ++i)
+            for (byte i = 0; i < 8; ++i)
             {
                 _key[i] = (byte)(key >> (7 - i) * 8);
             }
@@ -53,21 +53,14 @@ namespace Model
 #endif
         {
             byte[] result = new byte[7]; // already ignore every 8th bit
-            byte[] bitOrder = { 56, 48, 40, 32, 24, 16, 8, 0,    // Table 12.2 from source
-                                57, 49, 41, 33, 25, 17, 9, 1,    // with substracted one
-                                58, 50, 42, 34, 26, 18, 10, 2,   // from every number
-                                59, 51, 43, 35, 62, 54, 46, 38,  // to match array indexing
-                                30, 22, 14, 6, 61, 53, 45, 37,
-                                29, 21, 13, 5, 60, 52, 44, 36,
-                                28, 20, 12, 4, 27, 19, 11, 3}; 
             for (byte i = 0; i < result.Count(); ++i)
             {
                 for (byte j = 0; j < 8; ++j) // 8 bits in a byte
                 {
                     byte bitIndex = (byte)(i * 8 + j);
                     sbyte bitShift = (sbyte)(7 - j);
-                    byte tmp = Encryptor.GetBit(_key, bitOrder[bitIndex]);
-                    result[i] |= Encryptor.LeftBitShift(tmp, bitShift);
+                    byte tmp = Helpers.GetBit(_key, Tables.KeyPermutation[bitIndex]);
+                    result[i] |= Helpers.LeftBitShift(tmp, bitShift);
                 }
             }
             return result;
@@ -80,8 +73,8 @@ namespace Model
 #endif
         {
             byte[] shifts = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1 };
-            UInt32 leftHalf = GetIntFromByteArray(_56BitKey.Take(4).ToArray());    // both halves will have 28 bits, 
-            UInt32 rightHalf = GetIntFromByteArray(_56BitKey.Skip(3).Take(4).ToArray());   // 4 bits reserved
+            UInt32 leftHalf = Helpers.GetUInt32FromByteArray(_56BitKey.Take(4).ToArray()); // both halves will have 28 bits, 
+            UInt32 rightHalf = Helpers.GetUInt32FromByteArray(_56BitKey.Skip(3).Take(4).ToArray()); // 4 bits reserved
             leftHalf = (leftHalf >> 4);                 // move all bits to make most significant bits reserved
             rightHalf = (rightHalf & 0x0FFFFFFF);       // ignore first 4 bits
             for (byte i = 0; i < 16; ++i)
@@ -100,7 +93,7 @@ namespace Model
         {
             byte[] result = new byte[7];
             leftHalf <<= 4; // make least significant bits reserved
-            for(byte i = 0; i < 3; ++i) // rewrite first 3 bytes
+            for (byte i = 0; i < 3; ++i) // rewrite first 3 bytes
             {
                 result[i] = (byte)(leftHalf >> (3 - i) * 8);
             }
@@ -140,36 +133,15 @@ namespace Model
 #endif
         {
             byte[] result = new byte[6]; // Generate 48 bit subkeys
-            byte[] bitOrder = { 13, 16, 10, 23, 0, 4, 2, 27,     // Table 12.4 from source
-                                14, 5, 20, 9, 22, 18, 11, 3,     // with substracted one
-                                25, 7, 15, 6, 26, 19, 12, 1,     // from every number
-                                40, 51, 30, 36, 46, 54, 29, 39,  // to match array indexing
-                                50, 44, 32, 47, 43, 48, 38, 55,
-                                33, 52, 45, 41, 49, 35, 28, 31};
             for (int i = 0; i < result.Count(); ++i)
             {
                 for (int j = 0; j < 8; ++j) // 8 bits in a byte
                 {
                     byte bitIndex = (byte)(i * 8 + j);
                     sbyte bitShift = (sbyte)(7 - j);
-                    byte tmp = Encryptor.GetBit(key, bitOrder[bitIndex]);
-                    result[i] |= Encryptor.LeftBitShift(tmp, bitShift);
+                    byte tmp = Helpers.GetBit(key, Tables.SubkeyPermutation[bitIndex]);
+                    result[i] |= Helpers.LeftBitShift(tmp, bitShift);
                 }
-            }
-            return result;
-        }
-
-#if DEBUG
-        public static UInt32 GetIntFromByteArray(byte[] original)
-#else
-        private static UInt32 GetIntFromByteArray(byte[] original)
-#endif
-        {
-            UInt32 result = 0;
-            for(byte i = 0; i < original.Count(); i++)
-            {
-                result = result << 8;
-                result |= original[i];
             }
             return result;
         }

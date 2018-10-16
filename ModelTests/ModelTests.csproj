@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="DataTests.cs" />
     <Compile Include="EncryptorTests.cs" />
+    <Compile Include="HelpersTests.cs" />
     <Compile Include="KeyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
