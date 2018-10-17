@@ -84,5 +84,16 @@ namespace Model.Tests
             Assert.AreEqual((byte)0x3F, example[6]);
             Assert.AreEqual((byte)0x30, example[7]);
         }
+
+        [TestMethod()]
+        public void CalculateSBoxOutputsTest()
+        {
+            byte[] example = { 0x18, 0x11, 0x1E, 0x3A, 0x21, 0x26, 0x14, 0x27 };
+            example = _sut.CalculateSBoxOutputs(example);
+            Assert.AreEqual(0x5C, example[0]);
+            Assert.AreEqual(0x82, example[1]);
+            Assert.AreEqual(0xB5, example[2]);
+            Assert.AreEqual(0x97, example[3]);
+        }
     }
 }

@@ -71,14 +71,11 @@ namespace Model
         private byte[] CalculateRightHalf(byte[] left, byte[] right, byte iteration)
 #endif
         {
-            byte[] result = new byte[6];
+            byte[] result = new byte[4];
             right = ExpansionPermutation(right);
             byte[] XORed = Helpers.XORByteTables(right, _key.Subkeys.ElementAt(iteration));
-
-            // change array of 6 bytes to an array of 8 bytes with 2 reserved bits
-
-            //
-
+            byte[] sBoxInputs = ConvertByteArrayTo6BitArray(XORed);
+            result = CalculateSBoxOutputs(sBoxInputs);
             return result;
         }
 
@@ -103,13 +100,42 @@ namespace Model
         }
 
 #if DEBUG
+        public byte[] CalculateSBoxOutputs(byte[] inputs)
+#else
+        private byte[] CalculateSBoxOutputs(byte[] inputs)
+#endif
+        {
+            byte[] sBoxOutputs = new byte[4]; // 32 bits
+            byte outputIterator = 0;
+            bool isEven = false;
+            for (byte boxNumber = 0; boxNumber < inputs.Count(); ++boxNumber)
+            {
+                if(isEven)
+                {
+                    // 4 bits stay in their place;
+                    sBoxOutputs[outputIterator] |= GetSBoxValue(inputs[boxNumber], boxNumber);
+                    ++outputIterator; // iterate to the next byte of the result;
+                }
+                else
+                {
+                    sBoxOutputs[outputIterator] = 
+                        (byte)(GetSBoxValue(inputs[boxNumber], boxNumber) << 4);
+                    // move 4 result bits to the left side of the byte;
+                }
+                isEven = !isEven;
+            }
+            return sBoxOutputs;
+        }
+
+#if DEBUG
         public byte GetSBoxValue(byte sixBits, byte iteration)
 #else
         private byte GetSBoxValue(byte sixBits, byte iteration)
 #endif
         {
-            byte row = (byte)(sixBits >> 5);
-            row = (byte)(row << 1);
+            byte row = (byte)(sixBits >> 5); // get highest bit
+            row = (byte)(row << 1); // move it to second lowest place
+            row = (byte)(row | (byte)(sixBits & 0x01)); // get lowest bit
             byte column = (byte)(sixBits >> 1);
             column = (byte)(column & 0x0F);
             return sBoxes[iteration][row * 16 + column];
