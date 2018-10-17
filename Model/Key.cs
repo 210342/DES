@@ -34,6 +34,7 @@ namespace Model
                 _key = key;
             }
             _56BitKey = KeyPermutation();
+            GenerateSubkeys();
         }
 
         public Key(UInt64 key)
@@ -44,6 +45,7 @@ namespace Model
                 _key[i] = (byte)(key >> (7 - i) * 8);
             }
             _56BitKey = KeyPermutation();
+            GenerateSubkeys();
         }
 
 #if DEBUG
