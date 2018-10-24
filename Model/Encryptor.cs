@@ -18,52 +18,27 @@ namespace Model
 
         public byte[] EncryptedMessage { get; private set; } = new byte[0];
         public byte[] DecryptedMessage { get; private set; } = new byte[0];
+        public Encoding StringEncoding { get; private set; } = Encoding.Unicode;
 
         public Encryptor(Key key)
         {
             _key = key;
         }
 
+        public Encryptor(Key key, Encoding encoding)
+        {
+            _key = key;
+            StringEncoding = encoding;
+        }
+
         public void Encrypt(string message)
         {
-            Encrypt(message, Encoding.Unicode);
+            Encrypt(StringEncoding.GetBytes(message));
         }
 
-        public void Encrypt(string message, Encoding encoding)
+        public void Encrypt(byte[] message)
         {
-            Data data = new Data(message, encoding, _blockSize);
-            for(int i = 0; i < data.NumberOfBlocks; ++i)
-            {
-                try
-                {
-                    byte[] block = data.GetNBlock(i);
-                    block = InitialPermutation(block);
-
-                    for(byte round = 0; round < 16; ++round)
-                    {
-                        byte[] subkey = _key.Subkeys.ElementAt(round);
-                        block = Round(block.Take(4).ToArray(), block.Skip(4).Take(4).ToArray(), subkey);
-                    }
-
-                    block = ReversedInitialPermutation(block);
-                    EncryptedMessage = EncryptedMessage.Concat(block).ToArray();
-                }
-                catch
-                {
-                    throw;
-                }
-
-            }
-        }
-
-        public void Decrypt(string message)
-        {
-            Decrypt(message, Encoding.Unicode);
-        }
-
-        public void Decrypt(string message, Encoding encoding)
-        {
-            Data data = new Data(message, encoding, _blockSize);
+            Data data = new Data(message, _blockSize);
             for (int i = 0; i < data.NumberOfBlocks; ++i)
             {
                 try
@@ -71,20 +46,48 @@ namespace Model
                     byte[] block = data.GetNBlock(i);
                     block = InitialPermutation(block);
 
-                    for (byte round = 15; round >= 0; --round)
+                    for (byte round = 0; round < 16; ++round)
                     {
                         byte[] subkey = _key.Subkeys.ElementAt(round);
-                        block = Round(block.Take(4).ToArray(), block.Skip(4).Take(4).ToArray(), subkey);
+                        byte[] left = block.Take(4).ToArray();
+                        byte[] right = block.Skip(4).Take(4).ToArray();
+                        block = Round(left, right, subkey);
                     }
 
+                    block = ReverseLeftAndRight(block);
                     block = ReversedInitialPermutation(block);
-                    DecryptedMessage = EncryptedMessage.Concat(block).ToArray();
+                    EncryptedMessage = EncryptedMessage.Concat(block).ToArray();
                 }
                 catch
                 {
                     throw;
                 }
+            }
+        }
 
+        public void Decrypt(byte[] message)
+        {
+            Data data = new Data(message, _blockSize);
+            for (int i = 0; i < data.NumberOfBlocks; ++i)
+            {
+                try
+                {
+                    byte[] block = data.GetNBlock(i);
+                    block = InitialPermutation(block);
+
+                    for (sbyte round = 15; round >= 0; --round)
+                    {
+                        byte[] subkey = _key.Subkeys.ElementAt(round);
+                        block = Round(block.Take(4).ToArray(), block.Skip(4).Take(4).ToArray(), subkey);
+                    }
+                    block = ReverseLeftAndRight(block);
+                    block = ReversedInitialPermutation(block);
+                    DecryptedMessage = DecryptedMessage.Concat(block).ToArray();
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
 
@@ -105,9 +108,8 @@ namespace Model
         private byte[] CalculateRightHalf(byte[] left, byte[] right, byte[] key)
 #endif
         {
-            byte[] result = new byte[4];
-            right = ExpansionPermutation(right); // 0x 7A15 557A 1555
-            byte[] XORed = Helpers.XORByteTables(right, key); // 0x 6117 BA86 6527
+            byte[] eRight = ExpansionPermutation(right); // 0x 7A15 557A 1555
+            byte[] XORed = Helpers.XORByteTables(eRight, key); // 0x 6117 BA86 6527
             byte[] sBoxInputs = ConvertByteArrayTo6BitArray(XORed); // 0x 1811 1E3A 2126 1427
             byte[] sBoxOutputs = CalculateSBoxOutputs(sBoxInputs); // 0x 234A A9BB
             byte[] finalPermutation = RoundsFinalPermutation(sBoxOutputs);
@@ -254,16 +256,42 @@ namespace Model
                 byte[] bytesOrder = { 4, 0, 5, 1, 6, 2, 7, 3 };
                 for(int i = 0; i < bytesOrder.Count(); ++i)
                 {
-                    for (int j = 7; j >= 0; --j) // 8 bits in a byte
+                    for (sbyte j = 7; j >= 0; --j) // 8 bits in a byte
                     {
-                        sbyte bitShift = (sbyte)(-7 + i + j);
-                        int tmp = (byte)(original[j] & (byte)masks[7 - i]);
-                        result[bytesOrder[i]] |= Helpers.LeftBitShift(tmp, bitShift);
+                        sbyte bitShift = (sbyte)(j - i);
+                        int tmp = (byte)(original[bytesOrder[7 - j]] & (byte)masks[i]);
+                        result[i] |= Helpers.LeftBitShift(tmp, bitShift);
                     }
                 }
                 return result;
             }
             throw new ArgumentException("Array size doesn't match block size");
         }
+
+#if DEBUG
+        public byte[] ReverseLeftAndRight(byte[] original)
+#else
+        private byte[] ReverseLeftAndRight(byte[] original)
+#endif
+        {
+            byte[] left = original.Take(4).ToArray();
+            byte[] right = original.Skip(4).Take(4).ToArray();
+            return right.Concat(left).ToArray();
+        }
+
+        public string DecryptedToString()
+        {
+            string tmp = StringEncoding.GetString(DecryptedMessage);
+            string result = tmp.TrimEnd(new char[] { '\0' });
+            return result;
+        }
+
+#if DEBUG
+        // for testing purposes
+        public void SetDecMes(string message)
+        {
+            DecryptedMessage = StringEncoding.GetBytes(message);
+        }
+#endif
     }
 }

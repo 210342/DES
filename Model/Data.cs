@@ -19,14 +19,13 @@ namespace Model
         #endregion
 
         #region constructors
-        public Data(string data) : this(data, Encoding.Unicode, 8) { }
+        public Data(byte[] data) : this(data, 8) { }
 
-        public Data(string data, Encoding encoding, byte blockSize)
+        public Data(byte[] data, byte blockSize)
         {
+            _bytes = data;
             _blockSize = blockSize;
-            _encoding = encoding;
-            _bytes = encoding.GetBytes(data);
-            int leftover = _bytes.Count() % _blockSize; // if plain text is not divisible by size of a block
+            int leftover = data.Count() % _blockSize; // if plain text is not divisible by size of a block
             if(leftover != 0)
             {
                 byte[] nulls = Enumerable.Repeat((byte)0, _blockSize - leftover).ToArray(); // generate missing bytes

@@ -16,14 +16,14 @@ namespace Model.Tests
         [TestMethod()]
         public void DataTest()
         {
-            _sut = new Data("Noelo");
+            _sut = new Data(Encoding.Unicode.GetBytes("Noelo"));
             Assert.AreEqual(2, _sut.NumberOfBlocks);
         }
 
         [TestMethod()]
         public void GetNBlockTest()
         {
-            _sut = new Data("Noelo");
+            _sut = new Data(Encoding.Unicode.GetBytes("Noelo"));
             Assert.AreEqual("Noel", Encoding.Unicode.GetString(_sut.GetNBlock(0)));
             Assert.AreEqual("o\0\0\0", Encoding.Unicode.GetString(_sut.GetNBlock(1)));
         }
