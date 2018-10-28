@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Model;
 using System.Linq;
+using System.Text;
 
 namespace Model.Tests
 {
@@ -40,6 +41,29 @@ namespace Model.Tests
             Assert.AreEqual(0xFF, result[1]);
             Assert.AreEqual(0x00, result[2]);
             Assert.AreEqual(0x00, result[3]);
+        }
+
+        [TestMethod()]
+        public void ConvertToHexadecimalStringTest()
+        {
+            Assert.AreEqual("4C 6F 72 65 6D 20 69 70 73 75 6D",
+                Helpers.ConvertToHexadecimalString("Lorem ipsum"));
+        }
+
+        [TestMethod()]
+        public void ConvertToHexadecimalStringTest1()
+        {
+            Assert.AreEqual("4C 6F 72 65 6D 20 69 70 73 75 6D",
+                Helpers.ConvertToHexadecimalString
+                (Encoding.Default.GetBytes("Lorem ipsum")));
+        }
+
+        [TestMethod()]
+        public void ConvertFromHexadecimalStringTest()
+        {
+            Assert.AreEqual("Lorem ipsum",
+                Helpers.ConvertFromHexadecimalString
+                ("4C 6F 72 65 6D 20 69 70 73 75 6D"));
         }
     }
 }

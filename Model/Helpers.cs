@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public class Helpers
+    public static class Helpers
     {
         public static UInt32 GetUInt32FromByteArray(byte[] original)
         {
@@ -69,6 +69,47 @@ namespace Model
                 result[i] = (byte)(left[i] ^ right[i]);
             }
             return result;
+        }
+
+        /// <summary>
+        /// Converts a string to a string of its hexadecimal represantation
+        /// with spaces as byte delimiters
+        /// </summary>
+        /// <param name="input">String input</param>
+        /// <returns>Hexadecimal string</returns>
+        public static string ConvertToHexadecimalString(this string input)
+        {
+            byte[] bytes = Encoding.Default.GetBytes(input);
+            return (BitConverter.ToString(bytes)).Replace("-", " ");
+        }
+
+        /// <summary>
+        /// Converts a byte array to a string of its hexadecimal represantation
+        /// with spaces as byte delimiters
+        /// </summary>
+        /// <param name="input">Byte array input</param>
+        /// <returns>Hexadecimal string</returns>
+        public static string ConvertToHexadecimalString(this byte[] input)
+        {
+            return BitConverter.ToString(input).Replace("-", " ");
+        }
+
+        /// <summary>
+        /// Converts a string of a hexadecimal represantation
+        /// to the original string
+        /// </summary>
+        /// <param name="input">Byte array input</param>
+        /// <returns>Hexadecimal string</returns>
+        public static string ConvertFromHexadecimalString(this string input)
+        {
+            string withoutWhitespaces = input.Replace(" ", "").Replace("-", "");
+            byte[] result = new byte[withoutWhitespaces.Length / 2];
+            for(int i = 0; i < withoutWhitespaces.Length; i += 2)
+            {
+                string substring = withoutWhitespaces.Substring(i, 2);
+                result[i / 2] = Convert.ToByte(substring, 16);
+            }
+            return Encoding.Default.GetString(result);
         }
     }
 }

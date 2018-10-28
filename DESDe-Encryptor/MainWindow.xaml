@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DESDe_Encryptor"
         mc:Ignorable="d"
+        xmlns:viewModel = "clr-namespace:ViewModel.MainWindowVM"
         Background="#b1ffad"
+        DataContext="local:ViewModel.MainWindowVM"
         Title="Adam Troszczyński, Adrian Fijałkowski, Bartosz Goss" Height="768" Width="1024">
-    
+
     <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="88*"/>
@@ -76,7 +78,7 @@
         <TextBox Name="textBoxPath" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2"
                  IsEnabled="False" IsReadOnly="True" />
 
-        <Button Name="ReadFromFile" Grid.Row="4" Grid.Column="4">
+        <Button Name="ReadFromFile" Grid.Row="4" Grid.Column="4" Command="{Binding ReadFileCommand}">
             <Border Height="{Binding ElementName=ReadFromFile, Path=ActualHeight}" >
                 <Viewbox Stretch="Uniform">
                     <TextBlock Text="Read file" FontWeight="Medium" />
@@ -96,7 +98,8 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.CanContentScroll="True"
-                 TextWrapping="WrapWithOverflow" FontSize="20" FontWeight="Medium"/>
+                 TextWrapping="WrapWithOverflow" FontSize="20" FontWeight="Medium"
+                 Text="{Binding Input}"/>
 
         <!-- ROW 8: Margin -->
 
@@ -159,7 +162,8 @@
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.CanContentScroll="True"
                  TextWrapping="WrapWithOverflow" FontSize="20" FontWeight="Medium"
-                 IsReadOnly="True"/>
+                 IsReadOnly="True"
+                 Text="{Binding Output}"/>
 
         <!-- ROW 8: Margin -->
 
