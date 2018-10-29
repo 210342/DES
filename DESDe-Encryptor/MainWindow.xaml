@@ -1,14 +1,31 @@
-﻿<Window x:Class="DESDe_Encryptor.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DESDe_Encryptor"
+        xmlns:local="clr-namespace:DESDe_Encryptor.ViewModel"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:ViewModel="clr-namespace:DESDe_Encryptor.ViewModel;assembly=ViewModel" x:Class="DESDe_Encryptor.MainWindow"
         mc:Ignorable="d"
-        xmlns:viewModel = "clr-namespace:ViewModel.MainWindowVM"
         Background="#b1ffad"
-        DataContext="local:ViewModel.MainWindowVM"
         Title="Adam Troszczyński, Adrian Fijałkowski, Bartosz Goss" Height="768" Width="1024">
+
+    <Window.DataContext>
+        <ViewModel:MainWindowVM/>
+    </Window.DataContext>
+    <Window.Resources>
+        <ObjectDataProvider x:Key="GetTextFormatEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="ViewModel:TextFormatEnum"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="GetActionEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="ViewModel:ActionEnum"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    
 
     <Grid Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
@@ -44,42 +61,31 @@
 
         <!--                                                  ROW 0                                               -->
         <Viewbox StretchDirection="Both" Stretch="Uniform" Grid.Column="1" Grid.ColumnSpan="4">
-            <TextBlock Name="InputHalf" Text="INPUT" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold"/>
+            <TextBlock x:Name="InputHalf" Text="INPUT" HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold"/>
         </Viewbox>
 
         <!--                                                  ROW 1                                               -->
         <Viewbox StretchDirection="DownOnly" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="45">
-            <TextBlock Name="KeyTextBlock" Text="Key:" FontSize="25" />
+            <TextBlock x:Name="KeyTextBlock" Text="Key:" FontSize="25" />
         </Viewbox>
-        <TextBox Name="KeyTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
-                FontSize="20" Height="30" Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}" Margin="0,5" />
+        <TextBox x:Name="KeyTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
+                FontSize="20" Height="30" Width="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}" Margin="0,5" 
+                Text="{Binding KeyString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxLength="23" />
 
         <!--                                                 ROW 2                                                -->
-        <ComboBox Name="ComboBoxKey" Grid.Row="2" Grid.Column="2" SelectedIndex="1">
-            <ComboBoxItem Name="PlainText" VerticalContentAlignment="Stretch">
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}"  >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Text" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-            <ComboBoxItem Name="Hexadecimal" VerticalContentAlignment="Stretch" >
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}" >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Hexadecimal" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-        </ComboBox>
+        <ComboBox x:Name="ComboBoxKey" ItemsSource="{Binding Source={StaticResource GetTextFormatEnum}}" SelectedItem="{Binding KeyFormat, Mode=TwoWay}" 
+                  Grid.Row="2" Grid.Column="2" SelectedIndex="1"
+                  FontSize="25" FontWeight="Medium"/>
 
         <!-- ROW 3: Margin -->
 
         <!--                                                 ROW 4                                                -->
-        <TextBox Name="textBoxPath" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2"
-                 IsEnabled="False" IsReadOnly="True" />
+        <TextBox x:Name="textBoxPath" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2"
+                 IsEnabled="False" IsReadOnly="True" 
+                 Text="{Binding ReadFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <Button Name="ReadFromFile" Grid.Row="4" Grid.Column="4" Command="{Binding ReadFileCommand}">
-            <Border Height="{Binding ElementName=ReadFromFile, Path=ActualHeight}" >
+        <Button x:Name="ReadFromFile" Grid.Row="4" Grid.Column="4" Command="{Binding ReadFileCommand}">
+            <Border Height="{Binding ActualHeight, ElementName=ReadFromFile}" >
                 <Viewbox Stretch="Uniform">
                     <TextBlock Text="Read file" FontWeight="Medium" />
                 </Viewbox>
@@ -90,38 +96,26 @@
 
         <!--                                                 ROW 6                                                -->
         <Viewbox StretchDirection="Both" Stretch="Uniform" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4">
-            <TextBlock Name="TextBlockContent" Text="Content" FontWeight="DemiBold"/>
+            <TextBlock x:Name="TextBlockContent" Text="Content" FontWeight="DemiBold"/>
         </Viewbox>
 
         <!--                                                 ROW 7                                                -->
-        <TextBox Name="TextBoxData" Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="4" 
+        <TextBox x:Name="TextBoxData" Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="4" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.CanContentScroll="True"
-                 TextWrapping="WrapWithOverflow" FontSize="20" FontWeight="Medium"
-                 Text="{Binding Input}"/>
+                 TextWrapping="WrapWithOverflow" FontSize="15" FontWeight="Normal"
+                 Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <!-- ROW 8: Margin -->
 
         <!--                                                 ROW 9                                                -->
-        <ComboBox Name="ComboBoxContent" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="0">
-            <ComboBoxItem Name="PlainTextContent" VerticalContentAlignment="Stretch">
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}"  >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Text" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-            <ComboBoxItem Name="HexadecimalContent" VerticalContentAlignment="Stretch" >
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}" >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Hexadecimal" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-        </ComboBox>
-        <Button Name="Start" Grid.Row="9" Grid.RowSpan="3" Grid.Column="4">
-            <Border Height="{Binding ElementName=ReadFromFile, Path=ActualHeight}" >
+        <ComboBox x:Name="ComboBoxContent" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="0"
+                  ItemsSource="{Binding Source={StaticResource GetTextFormatEnum}}" SelectedItem="{Binding InputFormat, Mode=TwoWay}"
+                  FontSize="25" FontWeight="Medium"/>
+        
+        <Button x:Name="Start" Command="{Binding StartAction}" Grid.Row="9" Grid.RowSpan="3" Grid.Column="4">
+            <Border Height="{Binding ActualHeight, ElementName=ReadFromFile}" >
                 <Viewbox Stretch="Uniform">
                     <TextBlock Text="Start" FontWeight="Bold" />
                 </Viewbox>
@@ -132,64 +126,38 @@
 
         <!--                                                 ROW 11                                               -->
 
-        <ComboBox Name="ComboBoxAction" Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="0">
-            <ComboBoxItem Name="Encryption" VerticalContentAlignment="Stretch">
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}"  >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Encrypt" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-            <ComboBoxItem Name="Decryption" VerticalContentAlignment="Stretch" >
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}" >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Decrypt" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-        </ComboBox>
+        <ComboBox x:Name="ComboBoxAction" Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="0"
+                  ItemsSource="{Binding Source={StaticResource GetActionEnum}}" SelectedItem="{Binding Action, Mode=TwoWay}"
+                  FontSize="25" FontWeight="Bold"/>
 
         <!--                                            OUTPUT COLUMN                                             -->
 
         <!--                                              ROW 0                                                   -->
         <Viewbox StretchDirection="Both" Stretch="Uniform" Grid.Column="7" Grid.ColumnSpan="3" >
-            <TextBlock Name="OutputHalf" Text="OUTPUT" VerticalAlignment="Top" FontWeight="Bold" />
+            <TextBlock x:Name="OutputHalf" Text="OUTPUT" VerticalAlignment="Top" FontWeight="Bold" />
         </Viewbox>
 
         <!--                                             ROWS 1-7                                                 -->
-        <TextBox Name="TextBoxOutput" Grid.Row="1" Grid.Column="7" Grid.ColumnSpan="3" Grid.RowSpan="7"
+        <TextBox x:Name="TextBoxOutput" Grid.Row="1" Grid.Column="7" Grid.ColumnSpan="3" Grid.RowSpan="7"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  ScrollViewer.CanContentScroll="True"
-                 TextWrapping="WrapWithOverflow" FontSize="20" FontWeight="Medium"
+                 TextWrapping="WrapWithOverflow" FontSize="15" FontWeight="Normal"
                  IsReadOnly="True"
-                 Text="{Binding Output}"/>
+                 Text="{Binding Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <!-- ROW 8: Margin -->
 
         <!--                                                 ROW 9                                               -->
-        <ComboBox Name="ComboBoxOutput" Grid.Row="9" Grid.Column="7" SelectedIndex="0">
-            <ComboBoxItem Name="PlainTextOutput" VerticalContentAlignment="Stretch">
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}"  >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Text" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-            <ComboBoxItem Name="HexadecimalOutput" VerticalContentAlignment="Stretch" >
-                <Border Height="{Binding ElementName=ComboBoxKey, Path=ActualHeight}" >
-                    <Viewbox Stretch="Uniform" Margin="3,3">
-                        <TextBlock Text="Hexadecimal" />
-                    </Viewbox>
-                </Border>
-            </ComboBoxItem>
-        </ComboBox>
+        <ComboBox x:Name="ComboBoxOutput" Grid.Row="9" Grid.Column="7" SelectedIndex="0"
+                  ItemsSource="{Binding Source={StaticResource GetTextFormatEnum}}" SelectedItem="{Binding OutputFormat, Mode=TwoWay}"
+                  FontSize="25" FontWeight="Medium"/>
 
         <!-- ROW 10: Margin -->
 
         <!--                                                 ROW 11                                               -->
-        <Button Name="SaveToFile" Grid.Row="10" Grid.Column="9" Grid.RowSpan="2">
-            <Border Height="{Binding ElementName=ReadFromFile, Path=ActualHeight}" >
+        <Button x:Name="SaveToFile" Command="{Binding SaveFileCommand}" Grid.Row="11" Grid.Column="9">
+            <Border Height="{Binding ActualHeight, ElementName=ReadFromFile}" >
                 <Viewbox Stretch="Uniform">
                     <TextBlock Text="Save as file" FontWeight="Medium" />
                 </Viewbox>

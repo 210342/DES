@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace DESDe_Encryptor.ViewModel
 {
-    public enum TextFormatEnum
+    public enum ActionEnum
     {
-        [Description("Plain text")]
-        PlainText,
-        [Description("Hexadecimal")]
-        Hexadecimal
+        [Description("Decrypt")]
+        Decrypt,
+        [Description("Encrypt")]
+        Encrypt
     }
 }

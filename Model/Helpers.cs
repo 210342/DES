@@ -98,18 +98,42 @@ namespace Model
         /// Converts a string of a hexadecimal represantation
         /// to the original string
         /// </summary>
-        /// <param name="input">Byte array input</param>
+        /// <param name="input">String input</param>
         /// <returns>Hexadecimal string</returns>
         public static string ConvertFromHexadecimalString(this string input)
         {
+            return Encoding.Default.GetString(input.ConvertHexadecimalStringToByteArray());
+        }
+
+        /// <summary>
+        /// Converts a string of a hexadecimal represantation
+        /// to a byte array that this string represents
+        /// </summary>
+        /// <param name="input">String input</param>
+        /// <returns>Byte array of values represented by input string</returns>
+        public static byte[] ConvertHexadecimalStringToByteArray(this string input)
+        {
             string withoutWhitespaces = input.Replace(" ", "").Replace("-", "");
             byte[] result = new byte[withoutWhitespaces.Length / 2];
-            for(int i = 0; i < withoutWhitespaces.Length; i += 2)
+            for (int i = 0; i < withoutWhitespaces.Length; i += 2)
             {
                 string substring = withoutWhitespaces.Substring(i, 2);
                 result[i / 2] = Convert.ToByte(substring, 16);
             }
-            return Encoding.Default.GetString(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Deletes all ending zeros of a byte array
+        /// </summary>
+        /// <param name="input">Byte array</param>
+        /// <returns>Byte array without ending zeros</returns>
+        public static byte[] TruncateEndingZeros(this byte[] input)
+        {
+            int iterator = input.Count(); // start at last element
+            while (input[--iterator] == 0x00)
+                ;
+            return input.Take(iterator + 1).ToArray(); // Went one element too far
         }
     }
 }

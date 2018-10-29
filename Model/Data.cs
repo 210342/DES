@@ -11,7 +11,6 @@ namespace Model
         #region fields
         private readonly byte _blockSize;
         private readonly byte[] _bytes;
-        private readonly Encoding _encoding;
         #endregion
 
         #region properties

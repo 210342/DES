@@ -65,5 +65,13 @@ namespace Model.Tests
                 Helpers.ConvertFromHexadecimalString
                 ("4C 6F 72 65 6D 20 69 70 73 75 6D"));
         }
+
+        [TestMethod()]
+        public void TruncateEndingZerosTest()
+        {
+            byte[] example = new byte[] { 0x00, 0x15, 0x22, 0x00, 0x00 };
+            example = example.TruncateEndingZeros();
+            Assert.AreEqual(3, example.Count());
+        }
     }
 }
